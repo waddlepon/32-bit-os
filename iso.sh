@@ -6,10 +6,10 @@ mkdir -p iso
 mkdir -p iso/boot
 mkdir -p iso/boot/grub
 
-cp sysroot/boot/myos.kernel iso/boot/myos.kernel
+cp sysroot/boot/asbestos.kernel iso/boot/asbestos.kernel
 cat > iso/boot/grub/grub.cfg << EOF
-menuentry "myos" {
-    multiboot /boot/myos.kernel
+menuentry "asbestos" {
+    multiboot /boot/asbestos.kernel
 }
 EOF
-grub-mkrescue -o myos.iso iso
+grub-mkrescue -o asbestos.iso iso

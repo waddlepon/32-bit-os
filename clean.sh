@@ -8,4 +8,4 @@ done
 
 rm -rf sysroot
 rm -rf iso
-rm -rf myos.iso
+rm -rf asbestos.iso

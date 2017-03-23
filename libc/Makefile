@@ -3,7 +3,6 @@ HOST?=DEFAULT_HOST
 HOSTARCH!=../target-triplet-to-arch.sh $(HOST)
 
 CFLAGS?=-O2 -g
-CPPFLAGS?=
 LDFLAGS?=
 LIBS?=
 
@@ -41,6 +40,7 @@ $(ARCH_HOSTEDOBJS) \
 OBJS=\
 $(FREEOBJS) \
 $(HOSTEDOBJS) \
+
 LIBK_OBJS=$(FREEOBJS:.o=.libk.o)
 
 #BINARIES=libc.a libk.a # Not ready for libc yet.
