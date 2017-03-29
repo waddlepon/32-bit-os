@@ -3,7 +3,6 @@
 
 #include <kernel/idt.h>
 #include <kernel/pic.h>
-#include <kernel/serial.h>
 
 #include "keyboard.h"
 
@@ -115,7 +114,6 @@ struct interrupt_regs
 
 void isr_handler(struct interrupt_regs *regs)
 {
-    serial_writestring("isr interrupt");
 }
 
 void irq_handler(struct interrupt_regs *regs)

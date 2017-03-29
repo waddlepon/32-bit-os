@@ -22,7 +22,7 @@ char keyboard_get_scancode()
 
 char keyboard_get_char()
 {
-    return scan_code_table_2[keyboard_get_scancode()];
+    return scan_code_table_2[(int) keyboard_get_scancode()];
 }
 
 void keyboard_handle_char()
