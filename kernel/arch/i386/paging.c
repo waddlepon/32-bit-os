@@ -1,111 +1,56 @@
+#include <string.h>
+
 #include <kernel/paging.h>
-#include <stdio.h>
 
-#define PAGE_SIZE 0x1000
-#define INDEXES 32
+extern uint32_t * framemap;
+extern uint32_t nframes;
 
-extern uint32_t _kernel_end;
+extern uint32_t get_cr4();
 
-struct pageframe
+void paging_init(uint32_t kernel_start, uint32_t kernel_end)
 {
-    uint16_t index;
-    uint8_t bit;
-};
+    uint32_t page_directory_virt_addr = (uint32_t) framemap + nframes / 8;
 
-uint16_t hole = 0;
-uint32_t framemap[INDEXES];
-uint32_t startframe;
-struct pageframe next_page;
-
-void paging_init()
-{
-    startframe = _kernel_end;
-    next_page.index = 0;
-    next_page.bit = 0;
-}
-
-uint32_t alloc_frame()
-{
-    uint16_t index = 0;
-    uint8_t bit = 0;
-
-    if (hole)
+    if (page_directory_virt_addr % 0x1000 != 0)
     {
-        int i = 0;
-        while((framemap[i] & 0xFFFFFFFF) == 0xFFFFFFFF)
-        {
-            i++;
-            if (i == INDEXES)
-            {
-                return 0;
-            }
-        }
-        uint32_t b = 0x80000000;
-        uint32_t test = framemap[i] ^ 1;
-        int j = 0; 
-        while((b & test) == 0)
-        {
-            j++;
-            b >>= 1;
-        }
-
-        if (bit == 31)
-        {
-            index = i+1;
-            bit = 0;
-        }
-        else
-        {
-            index = i;
-            bit = j;
-        }
-        hole--;
-    }
-    else
-    {
-        index = next_page.index;
-        bit = next_page.bit;
-
-        if (bit == 31)
-        {
-            next_page.index = index + 1;
-            next_page.bit = 0;
-        }
-        else
-        {
-            next_page.index = index;
-            next_page.bit = bit + 1;
-        }
+        page_directory_virt_addr = (page_directory_virt_addr & ~(0xFFF)) + 0x1000;
     }
 
-    framemap[index] |= 0x80000000 >> bit;
-    return (uint32_t) startframe + (32 * index + bit) * PAGE_SIZE;
-}
+    uint32_t page_table_virt_addr = page_directory_virt_addr + 0x1000;
 
-void free_frame(uint32_t a)
-{
-    a = (a - startframe)/PAGE_SIZE;
-    uint8_t bit = a % 32;
-    uint16_t index = (a - bit)/32;
-    
-    uint8_t test_bit;
-    uint16_t test_index;
+    uint32_t page_directory_phys_addr = page_directory_virt_addr - 0xC0000000;
+    uint32_t page_table_phys_addr = page_table_virt_addr - 0xC0000000;
 
-    if (next_page.bit == 0)
+    uint32_t * page_directory_ptr = (uint32_t *) page_directory_virt_addr;
+
+    memset(page_directory_ptr, 0, 0x1000);
+
+    for (uint32_t i = 0; i < 1024; i++)
     {
-        test_bit = 31;
-        test_index = next_page.index - 1;
-    }
-    else
-    {
-        test_bit = next_page.bit - 1;
-        test_index = next_page.index;
+        page_directory_ptr[i] = 0 | 2;
     }
 
-    if (!(bit == test_bit && index == test_index))
+    uint32_t * page_table_ptr = (uint32_t *) page_table_virt_addr;
+
+    memset((uint8_t *) page_table_ptr, 0, 0x1000);
+
+    for (uint32_t i = 0; i < 1024; i++)
     {
-        hole++;
+        page_table_ptr[i] = (i * 0x1000) | 3;
     }
 
-    framemap[index] &= ((0x80000000 >> bit) ^ 1);
+    uint32_t kernel_index = 0xC0000000 >> 22;
+
+    page_directory_ptr[kernel_index] = page_table_phys_addr | 3;
+
+    page_directory_ptr[1023] = page_directory_phys_addr | 3;
+
+    uint32_t new_cr4 = get_cr4() & ~(0x00000010);
+
+    asm volatile (
+            "mov %0, %%cr3\n\t"
+            "mov %1, %%cr4"
+            :
+            : "r" (page_directory_phys_addr), "r" (new_cr4)
+    );
 }
