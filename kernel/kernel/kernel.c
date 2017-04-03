@@ -6,7 +6,9 @@
 #include <kernel/serial.h>
 #include <kernel/gdt.h>
 #include <kernel/idt.h>
+#include <kernel/interrupts.h>
 #include <kernel/pic.h>
+#include <kernel/keyboard.h>
 #include <kernel/pmm.h>
 #include <kernel/paging.h>
 
@@ -31,10 +33,13 @@ void kernel_main(multiboot_info_t *mbi)
 
     PIC_init(); 
     serial_writestring("PIC initialized\n");
-    enable_interrupts();
+
+    keyboard_init();
 
     terminal_init();
     serial_writestring("Terminal initialized\n");
+
+    enable_interrupts();
     
     printf("Welcome to asbestOS\n");
     for (;;)

@@ -1,3 +1,5 @@
+#include <kernel/keyboard.h>
+#include <kernel/interrupts.h>
 #include <kernel/tty.h>
 
 #include "io.h"
@@ -25,9 +27,14 @@ char keyboard_get_char()
     return scan_code_table_2[(int) keyboard_get_scancode()];
 }
 
-void keyboard_handle_char()
+void keyboard_handle_char(struct interrupt_regs * regs)
 {
     char key = keyboard_get_char();
     terminal_putchar(key);
     terminal_update_cursor(terminal_get_row(), terminal_get_column());
+}
+
+void keyboard_init()
+{
+    register_interrupt(IRQ_BASE + 1,  &keyboard_handle_char);
 }

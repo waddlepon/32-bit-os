@@ -2,9 +2,6 @@
 #define _KERNEL_IDT_H
 
 void idt_init();
-void enable_interrupts();
-void disable_interrupts();
-void test_interrupt();
 
 //intel exceptions
 extern void isr0();
@@ -60,4 +57,5 @@ extern void irq12();
 extern void irq13();
 extern void irq14();
 extern void irq15();
+
 #endif

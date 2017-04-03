@@ -2,11 +2,6 @@
 #include <string.h>
 
 #include <kernel/idt.h>
-#include <kernel/pic.h>
-
-#include "keyboard.h"
-
-#define IRQ_BASE 32
 
 struct idt_entry
 {
@@ -102,27 +97,4 @@ void idt_init()
     idt_entries[49] = create_idt_entry((uint32_t)isr49, 0x08, 0x8E);
 
     idt_flush();
-}
-
-struct interrupt_regs
-{
-    uint32_t gs, fs, es, ds;
-    uint32_t edi, esi, ebp, esp, ebx, edx, ecx, eax;
-    uint32_t int_no, err_code;
-    uint32_t eip, cs, eflags, useresp, ss;
-} __attribute__((packed));
-
-void isr_handler(struct interrupt_regs *regs)
-{
-}
-
-void irq_handler(struct interrupt_regs *regs)
-{
-    int irq = regs->int_no - IRQ_BASE;
-
-    if (irq == 1)
-    {
-        keyboard_handle_char();
-    }
-    PIC_send_EOI(irq);
 }
