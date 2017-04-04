@@ -106,5 +106,6 @@ void PIC_init()
     {
         IRQ_set_mask(i);
     }
+    IRQ_clear_mask(0);
     IRQ_clear_mask(1);
 }

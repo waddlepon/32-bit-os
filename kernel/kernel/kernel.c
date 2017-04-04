@@ -9,6 +9,7 @@
 #include <kernel/interrupts.h>
 #include <kernel/pic.h>
 #include <kernel/keyboard.h>
+#include <kernel/timer.h>
 #include <kernel/pmm.h>
 #include <kernel/paging.h>
 
@@ -35,6 +36,7 @@ void kernel_main(multiboot_info_t *mbi)
     serial_writestring("PIC initialized\n");
 
     keyboard_init();
+    timer_init(1000);
 
     terminal_init();
     serial_writestring("Terminal initialized\n");
