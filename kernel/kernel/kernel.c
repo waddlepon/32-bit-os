@@ -12,6 +12,7 @@
 #include <kernel/timer.h>
 #include <kernel/pmm.h>
 #include <kernel/paging.h>
+#include <kernel/vmm.h>
 
 extern uint32_t _kernel_start;
 extern uint32_t _kernel_end;

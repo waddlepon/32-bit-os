@@ -51,11 +51,11 @@ void keyboard_handle_char(struct interrupt_regs * regs)
         
         if (shift_down)
         {
-            key = scan_code_table_shift[scancode];
+            key = scan_code_table_shift[(int)scancode];
         }
         else
         {
-            key = scan_code_table_noshift[scancode];
+            key = scan_code_table_noshift[(int)scancode];
         }
     }
 
