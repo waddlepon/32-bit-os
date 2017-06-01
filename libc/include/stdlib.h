@@ -3,7 +3,12 @@
 
 #include <sys/cdefs.h>
 
+#include <stddef.h>
+
 __attribute__((__noreturn__))
 void abort(void);
+
+void * malloc(size_t size);
+void free(void * mem);
 
 #endif

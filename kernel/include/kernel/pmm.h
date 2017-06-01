@@ -1,5 +1,5 @@
-#ifndef _KERNEL_MM_H
-#define _KERNEL_MM_H
+#ifndef _KERNEL_PMM_H
+#define _KERNEL_PMM_H
 
 #include <stdint.h>
 #include <stddef.h>

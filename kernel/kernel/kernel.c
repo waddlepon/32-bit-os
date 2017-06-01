@@ -13,6 +13,7 @@
 #include <kernel/pmm.h>
 #include <kernel/paging.h>
 #include <kernel/vmm.h>
+#include <kernel/panic.h>
 
 extern uint32_t _kernel_start;
 extern uint32_t _kernel_end;
@@ -44,7 +45,9 @@ void kernel_main(multiboot_info_t *mbi)
 
     enable_interrupts();
     
-    printf("Welcome to asbestOS\n");
+    printf("Welcome to my OS\n\n");
+    printf("You can type here if you want\n");
+    panic("Test error");
     for (;;)
     {
         asm("hlt");

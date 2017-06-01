@@ -32,6 +32,20 @@ void terminal_init(void)
     }
 }
 
+void terminal_clear()
+{
+    terminal_row = 0;
+    terminal_column = 0;
+    for (size_t y = 0; y < VGA_HEIGHT; y++)
+    {
+        for (size_t x = 0; x < VGA_WIDTH; x++)
+        {
+            const size_t index = y * VGA_WIDTH + x;
+            terminal_buffer[index] = vga_entry(' ', terminal_color);
+        }
+    }
+}
+
 void terminal_setcolor(uint8_t color)
 {
     terminal_color = color;
@@ -59,6 +73,12 @@ void terminal_scroll()
     terminal_row = VGA_HEIGHT-1;
 }
 
+char terminal_get_char(int row, int col)
+{
+    const size_t index = row * VGA_WIDTH + col;
+    return (char) (terminal_buffer[index] & 0x00FF);
+}
+
 size_t terminal_get_row()
 {
     return terminal_row;
@@ -67,6 +87,56 @@ size_t terminal_get_row()
 size_t terminal_get_column()
 {
     return terminal_column;
+}
+
+uint32_t terminal_line_last_character(int row)
+{
+    for (size_t i = VGA_WIDTH - 2; i > 0 ; i--)
+    {
+        if (terminal_get_char(row, i) != ' ')
+        {
+            return i + 1;
+        }
+    }
+    return 0;
+}
+
+void terminal_cursor_up()
+{
+    if (terminal_row == 0) return;
+
+    terminal_row--;
+    uint32_t last_character = terminal_line_last_character(terminal_row);
+    if (last_character < terminal_column)
+    {
+        terminal_column = last_character;
+    }
+}
+
+void terminal_cursor_down()
+{
+    if (terminal_row == VGA_HEIGHT - 1) return;
+
+    terminal_row++;
+    uint32_t last_character = terminal_line_last_character(terminal_row);
+    if (last_character < terminal_column)
+    {
+        terminal_column = last_character;
+    }
+}
+
+void terminal_cursor_left()
+{
+    if (terminal_column == 0) return;
+    
+    terminal_column--;
+}
+
+void terminal_cursor_right()
+{
+    if (terminal_column == VGA_WIDTH - 1) return;
+    
+    terminal_column++;
 }
 
 void terminal_update_cursor(int row, int col)
@@ -102,7 +172,7 @@ void terminal_putchar(char c)
             else
             {
                 terminal_row--;
-                terminal_column = VGA_WIDTH;
+                terminal_column = terminal_line_last_character(terminal_row); 
             }
         }
         else

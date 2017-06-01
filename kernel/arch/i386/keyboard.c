@@ -29,7 +29,7 @@ HOME, UP, PGUP,'-', LEFT, '5', RIGHT, '+', END, DOWN, PGDN, INS, DEL, 0, 0, 0, F
 void keyboard_handle_char(struct interrupt_regs * regs)
 {
     char scancode = inb(0x60);
-    char key;
+    unsigned char key;
 
     if (scancode & 0x80)
     {
@@ -59,7 +59,32 @@ void keyboard_handle_char(struct interrupt_regs * regs)
         }
     }
 
-    terminal_putchar(key);
+    if (key == LEFT || key == RIGHT || key == UP || key == DOWN)
+    {
+        switch(key)
+        {
+            case LEFT :
+                terminal_cursor_left();
+                break;
+
+            case RIGHT :
+                terminal_cursor_right();
+                break;
+
+            case UP :
+                terminal_cursor_up();
+                break;
+
+            case DOWN :
+                terminal_cursor_down();
+                break;
+        }
+    }
+    else
+    {
+        terminal_putchar(key);
+    }
+
     terminal_update_cursor(terminal_get_row(), terminal_get_column());
 }
 
