@@ -1,2 +1,2 @@
 # OSdev project 
-Based on sutff from OSdev wiki
+A toy operating system written in C and assembly for 2016 Quest.
